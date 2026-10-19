@@ -1,0 +1,136 @@
+const {post}=require("../data/data.js");
+
+
+// get
+const getAllpost=(req,res)=>{
+    try{
+        res.status(200).json({
+            success:true,
+        data:post
+
+        })
+        
+    }catch(err){
+        res.status(500).json({
+            success:false,
+            message:err.message
+        })
+
+    }
+}
+
+// create
+const craetePost=(req,res)=>{
+    try{
+        let{name,age,city} = req.body;
+        if(!name||!age||!city){
+            return res.status(400).json({
+                success:false,
+                message:"please provide name,age and city"
+            })
+        }
+    let newpost={...req.body,
+        id:String(Date.now())
+    }
+    post.push(newpost);
+    res.status(201).json({
+        success:true,
+        data:post
+    })
+}catch (err){
+        res.status(500).json({
+            success:false,
+            message:"server error"
+        })
+
+    }
+}
+
+// update
+const updatePost = (req, res) => {
+    try {
+        let PostId = req.params.id;
+        let body = req.body;
+
+        let Index = post.findIndex(t => t.id == PostId);
+
+        // Check blog exists
+        if (Index === -1) {
+            return res.status(404).json({
+                success: false,
+                message: `post not found with id ${PostId}`
+            });
+        }
+
+        // Validate request body
+        if (!body.name && !body.age && !body.city) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide name, age or city"
+            });
+        }
+
+        // Update blog data
+        let upobj = {
+            ...post[Index],
+            ...body,
+            id: post[Index].id
+        };
+
+        // Save updated blog
+        post[Index] = upobj;
+
+        // Send response
+        res.status(200).json({
+            success: true,
+            message: `post updated successfully with id ${PostId}`,
+            data: upobj
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: err.message
+        });
+    }
+};
+
+
+// delete
+
+const DeletePost=(req,res)=>{
+    try{
+        let Remove_id=req.params.id;
+        let index=post.findIndex(t=>t.id==Remove_id)
+        if(index=== -1){
+            return res.status(404).json({
+                success:false,
+                message:`post not found with id ${Remove_id}`
+            });
+        }
+        post.splice(index,1)
+        res.status(200).json({
+            success:true,
+                message:`post sucsesfully deleted with id ${Remove_id}`
+           
+        });
+
+    }catch(err){
+        res.status(500).json({
+            success:false,
+            message:"server error",
+            err:err.message
+
+        })
+
+
+    }
+}
+
+module.exports={
+    getAllpost,
+    craetePost,
+    updatePost,
+    DeletePost
+}
